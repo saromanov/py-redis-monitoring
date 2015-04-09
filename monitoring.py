@@ -1,7 +1,7 @@
 import redis
 import datetime
-from multiprocessing import Process, Pool
 import threading
+import time
 
 class Monitoring:
 	def __init__(self, host='localhost', port=6379):
@@ -18,16 +18,14 @@ class Monitoring:
 	def _start_receiving(self, connect):
 		while True:
 			self.processing.receive_response(connect.read_response())
-
 	def _createMonitor(self, server):
 		client = self._createClient(server['host'], server['port'])
 		connect = client.get_connection('monitor', None)
 		connect.send_command('monitor')
 		print("monitoring of server {0}:{1} has started...".format(server['host'], server['port']), datetime.datetime.now())
-		pool = Pool(processes=1)
-		pool.apply_async(self._start_receiving, [connect], callback=self.getter1)
-		pool.close()
-		#pool.join()
+		th = threading.Thread(target=self._start_receiving, args=(connect, ))
+		th.setDaemon(True)
+		th.start()
 
 	def getter1(self, value):
 		print(value)
@@ -37,6 +35,8 @@ class Monitoring:
 		""" Start monitoring """
 		for server in self.servers:
 			self._createMonitor(server)
+		while True:
+			time.sleep(2)
 
 class Processing:
 	""" Processing and analytics receive commands """
