@@ -2,10 +2,16 @@ import redis
 import datetime
 import threading
 import time
+from collections import Counter
+import hashlib
 
 class Monitoring:
-	def __init__(self, host='localhost', port=6379):
+	"""
+		clearall - clear all store before start monitoring 
+	"""
+	def __init__(self, host='localhost', port=6379, show_every=10, clearall=False):
 		self.servers = []
+		self.show_every = show_every
 		#self.client = redis.ConnectionPool(host=host, port=port)
 		self.processing = Processing()
 
@@ -31,7 +37,7 @@ class Monitoring:
 		print(value)
 
 
-	def start(self):
+	def start(self, addr='localhost'):
 		""" Start monitoring """
 		for server in self.servers:
 			self._createMonitor(server)
@@ -42,18 +48,40 @@ class Processing:
 	""" Processing and analytics receive commands """
 	def __init__(self):
 		self.host = {}
+		self.commands_stat = Counter()
+		self.redis_store = RedisWrite('localhost', '6399')
 
 	def receive_response(self, response):
 		if len(response) == 2:
 			return 
-		value = self._parse_response(response)
-		iddata = value[0]
-		self.host[value[1][1]] = {}
-		self._parse_command(value[3:])
+		addr, command, params = self._parse_response(response)
+		self.commands_stat[command] += 1
+		md5 = hashlib.md5()
+		md5.update(addr)
+		self.redis_store.putEvent(md5.hexdigest(), command, params)
+		#self.host[value[1][1]] = {}
 
 	def _parse_response(self, response):
-		return response.split()
+		raw = response.split()
+		addr = raw[2][:-1]
+		command = raw[3][1:-1]
+		params = raw[4:]
+		return addr, command, params
 
-	def _parse_command(self, raw_command):
-		print("this is command: ", raw_command)
+	def show_commands_stat(self):
+		return self.commands_stat
+
+
+class RedisWrite:
+	def __init__(self, host, port):
+		self.client = redis.StrictRedis(connection_pool=redis.ConnectionPool(host=host, port=port))
+
+	def putEvent(self, addr, command, params):
+		self.client.hincrby(addr, command)
+
+class Event:
+	def __init__(self, addr, command, params):
+		self.addr = addr
+		self.command = command
+		self.params = params
 
