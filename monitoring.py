@@ -7,7 +7,8 @@ import hashlib
 
 class Monitoring:
 	"""
-		clearall - clear all store before start monitoring 
+		clearall - clear all store before start monitoring
+		monitoring_host, monitoring_port in case if backend is redis 
 	"""
 	def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, monitoring_host='localhost',
 		monitoring_port='6399'):
@@ -80,6 +81,7 @@ class RedisWrite:
 	def putEvent(self, addr, command, params):
 		self.client.hincrby(addr, command)
 		self.client.hincrby('allhosts', command)
+		self.client.hincrby('allhosts:{0}'.format(command), params)
 
 class Event:
 	def __init__(self, addr, command, params):
