@@ -9,11 +9,12 @@ class Monitoring:
 	"""
 		clearall - clear all store before start monitoring 
 	"""
-	def __init__(self, host='localhost', port=6379, show_every=10, clearall=False):
+	def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, monitoring_host='localhost',
+		monitoring_port='6399'):
 		self.servers = []
 		self.show_every = show_every
 		#self.client = redis.ConnectionPool(host=host, port=port)
-		self.processing = Processing()
+		self.processing = Processing(monitoring_host, monitoring_port)
 
 	def _createClient(self,host, port):
 		return redis.ConnectionPool(host=host, port=port)
@@ -46,10 +47,10 @@ class Monitoring:
 
 class Processing:
 	""" Processing and analytics receive commands """
-	def __init__(self):
+	def __init__(self, host, port):
 		self.host = {}
 		self.commands_stat = Counter()
-		self.redis_store = RedisWrite('localhost', '6399')
+		self.redis_store = RedisWrite(host, port)
 
 	def receive_response(self, response):
 		if len(response) == 2:
@@ -78,6 +79,7 @@ class RedisWrite:
 
 	def putEvent(self, addr, command, params):
 		self.client.hincrby(addr, command)
+		self.client.hincrby('allhosts', command)
 
 class Event:
 	def __init__(self, addr, command, params):

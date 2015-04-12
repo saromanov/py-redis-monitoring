@@ -6,10 +6,21 @@ class ProcessingClient:
 		if backend == 'redis':
 			self.client = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port='6399'))
 
-	def getCommandStat(self, command):
+	def _processHost(self, host):
 		md5 = hashlib.md5()
-		md5.update(b'127.0.0.1:47094')
-		return self.client.hget(md5.hexdigest(), command)
+		md5.update(host)
+		return md5.hexdigest()
 
-	def getCommands(self):
-		pass
+	def getCommandStat(self, command, host='allhosts'):
+		if host != 'allhosts':
+			host = self._processHost(host)
+		return self.client.hget(host, command)
+
+	def getCommandsStat(self, host='allhosts'):
+		""" Return counters for all commands """
+		if host != 'allhosts':
+			host = self._processHost(host)
+		def sortResults(results):
+			return sorted(results, key=lambda x: x[1], reverse=True)
+		result = list(map(lambda x: (x, self.getCommandStat(x, host=host)), self.client.hkeys(host)))
+		return sortResults(result)
