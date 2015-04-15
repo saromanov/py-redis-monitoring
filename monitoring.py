@@ -75,13 +75,18 @@ class Processing:
 
 
 class RedisWrite:
+	""" Write data to addition redis db """
 	def __init__(self, host, port):
 		self.client = redis.StrictRedis(connection_pool=redis.ConnectionPool(host=host, port=port))
 
 	def putEvent(self, addr, command, params):
+		""" Increment new command """
 		self.client.hincrby(addr, command)
 		self.client.hincrby('allhosts', command)
 		self.client.hincrby('allhosts:{0}'.format(command), params)
+		"""Append data by hour """
+		hour = datetime.datetime.now().hour
+		self.client.hincrby('allhosts:h{0}'.format(hour), command)
 
 class Event:
 	def __init__(self, addr, command, params):

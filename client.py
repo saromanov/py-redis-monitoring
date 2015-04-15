@@ -16,6 +16,14 @@ class ProcessingClient:
 			host = self._processHost(host)
 		return self.client.hget(host, command)
 
+	def getCommandStatByHour(self, hour, command, host='allhosts'):
+		""" Return statistics for commands by hour.
+			For example, hour=10 command='hset' return statistic for command in 10 a.m
+		"""
+		if hour >=0 and hour <= 23:
+			return self.client.hget('{0}:h{1}'.format(host, hour), command)
+		raise Exception("Error in hour param") 
+
 	def getCommandsStat(self, host='allhosts'):
 		""" Return counters for all commands """
 		if host != 'allhosts':
