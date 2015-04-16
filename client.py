@@ -37,3 +37,9 @@ class ProcessingClient:
 		if host != 'allhosts':
 			host = self._processHost(host)
 		return self.client.hkeys('{0}:{1}'.format(host, command))
+
+	def getAllCommandsHistory(self, host='allhosts'):
+		""" Return history for all commands """
+		if host != 'allhosts':
+			host = self._processHost(host)
+		return self.client.lrange('{0}:commands'.format(host), 0, -1)

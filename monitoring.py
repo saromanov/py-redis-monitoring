@@ -11,7 +11,7 @@ class Monitoring:
 		monitoring_host, monitoring_port in case if backend is redis 
 	"""
 	def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, monitoring_host='localhost',
-		monitoring_port='6399'):
+		monitoring_port='6399', backend=True):
 		self.servers = []
 		self.show_every = show_every
 		#self.client = redis.ConnectionPool(host=host, port=port)
@@ -26,6 +26,7 @@ class Monitoring:
 	def _start_receiving(self, connect):
 		while True:
 			self.processing.receive_response(connect.read_response())
+
 	def _createMonitor(self, server):
 		client = self._createClient(server['host'], server['port'])
 		connect = client.get_connection('monitor', None)
@@ -87,6 +88,8 @@ class RedisWrite:
 		"""Append data by hour """
 		hour = datetime.datetime.now().hour
 		self.client.hincrby('allhosts:h{0}'.format(hour), command)
+		#Append curent received command to list
+		self.client.lpush('allhosts:commands', command)
 
 class Event:
 	def __init__(self, addr, command, params):
