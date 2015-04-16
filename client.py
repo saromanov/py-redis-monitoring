@@ -43,3 +43,11 @@ class ProcessingClient:
 		if host != 'allhosts':
 			host = self._processHost(host)
 		return self.client.lrange('{0}:commands'.format(host), 0, -1)
+
+	def getDBSize(self):
+		script = """
+		local result = redis.call("dbsize")
+		return tonumber(result), 10
+		"""
+		value = self.client.register_script(script)
+		return value()
