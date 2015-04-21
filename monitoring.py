@@ -10,8 +10,7 @@ class Monitoring:
 		clearall - clear all store before start monitoring
 		monitoring_host, monitoring_port in case if backend is redis 
 	"""
-	def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, monitoring_host='localhost',
-		monitoring_port='6399', backend=True):
+	def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, backend=None, address=None):
 		self.servers = []
 		self.show_every = show_every
 		#self.client = redis.ConnectionPool(host=host, port=port)

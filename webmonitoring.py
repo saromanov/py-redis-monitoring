@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from monitoring import Monitoring
 app = Flask(__name__)
 monitor = Monitoring(backend=False)
@@ -10,3 +10,6 @@ def main_page():
 
 def run_webmonitor():
 	app.run()
+
+if __name__ == "__main__":
+	run_webmonitor()
