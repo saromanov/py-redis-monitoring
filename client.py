@@ -2,9 +2,10 @@ import redis
 import hashlib
 
 class ProcessingClient:
+	""" Client just connect to another redis db """
 	def __init__(self, backend='redis'):
 		if backend == 'redis':
-			self.client = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port='6399'))
+			self.client = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port='6379'))
 
 	def _processHost(self, host):
 		md5 = hashlib.md5()
@@ -22,7 +23,7 @@ class ProcessingClient:
 		"""
 		if hour >=0 and hour <= 23:
 			return self.client.hget('{0}:h{1}'.format(host, hour), command)
-		raise Exception("Error in hour param") 
+		raise Exception("Error in hour param")
 
 	def getCommandsStat(self, host='allhosts'):
 		""" Return counters for all commands """
