@@ -3,9 +3,9 @@ import hashlib
 
 class ProcessingClient:
 	""" Client just connect to another redis db """
-	def __init__(self, backend='redis'):
+	def __init__(self, backend='redis', host='localhost', port=6379):
 		if backend == 'redis':
-			self.client = redis.Redis(connection_pool=redis.ConnectionPool(host='localhost', port='6379'))
+			self.client = redis.Redis(connection_pool=redis.ConnectionPool(host=host, port=str(6379)))
 
 	def _processHost(self, host):
 		md5 = hashlib.md5()
