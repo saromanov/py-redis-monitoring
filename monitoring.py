@@ -8,13 +8,13 @@ import hashlib
 class Monitoring:
 	"""
 		clearall - clear all store before start monitoring
-		monitoring_host, monitoring_port in case if backend is redis 
+		monitoring_host, monitoring_port in case if backend is redis
 	"""
 	def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, backend=None, address=None):
 		self.servers = []
 		self.show_every = show_every
 		#self.client = redis.ConnectionPool(host=host, port=port)
-		self.processing = Processing(monitoring_host, monitoring_port)
+		self.processing = Processing(host, port)
 
 	def _createClient(self,host, port):
 		return redis.ConnectionPool(host=host, port=port)
@@ -55,7 +55,7 @@ class Processing:
 
 	def receive_response(self, response):
 		if len(response) == 2:
-			return 
+			return
 		addr, command, params = self._parse_response(response)
 		self.commands_stat[command] += 1
 		md5 = hashlib.md5()
