@@ -12,6 +12,9 @@ class Monitoring:
     """
     def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, backend=None, address=None):
         self.servers = []
+        self.host = host
+        self.port = port
+        self.notifications={}
         self.show_every = show_every
         #self.client = redis.ConnectionPool(host=host, port=port)
         self.processing = Processing(host, port)
@@ -21,6 +24,11 @@ class Monitoring:
 
     def addServer(self, host, port):
         self.servers.append({'host':host, 'port':port})
+
+    def addNotify(self, event, estimatefunc):
+        ''' this method provides notification after level
+        '''
+        self.notifications[event] = estimatefunc
 
     def _start_receiving(self, connect):
         while True:
@@ -37,6 +45,7 @@ class Monitoring:
 
     def start(self, addr='localhost'):
         """ Start monitoring """
+        self.processing = Processing(self.host, self.port, notify=self.notifications)
         for server in self.servers:
             self._createMonitor(server)
         while True:
@@ -44,8 +53,9 @@ class Monitoring:
 
 class Processing:
     """ Processing and analytics receive commands """
-    def __init__(self, host, port):
+    def __init__(self, host, port, notify={}):
         self.host = {}
+        self.notify = notify
         self.commands_stat = Counter()
         self.redis_store = RedisWrite(host, port)
 
@@ -54,8 +64,9 @@ class Processing:
             return
 
         addr, command, params = self._parse_response(response)
+        if command.decode('utf-8') in self.notify:
+            self.notify(command)
         command = str(command).lower()
-        print(command)
         self.commands_stat[command] += 1
         md5 = hashlib.md5()
         md5.update(addr)
