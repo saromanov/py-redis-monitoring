@@ -62,11 +62,11 @@ class Processing:
     def receive_response(self, response):
         if len(response) == 2:
             return
-
         addr, command, params = self._parse_response(response)
-        if command.decode('utf-8') in self.notify:
+        command = command.decode('utf-8')
+        if command in self.notify:
             self.notify(command)
-        command = str(command).lower()
+        command = command.lower()
         self.commands_stat[command] += 1
         md5 = hashlib.md5()
         md5.update(addr)
