@@ -26,7 +26,7 @@ class Monitoring:
         self.servers.append({'host':host, 'port':port})
 
     def addNotify(self, event, estimatefunc):
-        ''' this method provides notification after level
+        ''' this method provides notification if estimatefunc is true
         '''
         self.notifications[event] = estimatefunc
 
