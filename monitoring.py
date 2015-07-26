@@ -16,14 +16,29 @@ class Monitoring:
         self.port = port
         self.notifications={}
         self.show_every = show_every
-        #self.client = redis.ConnectionPool(host=host, port=port)
         self.processing = Processing(host, port)
 
     def _createClient(self,host, port):
         return redis.ConnectionPool(host=host, port=port)
 
     def addServer(self, host, port):
-        self.servers.append({'host':host, 'port':port})
+        ports = self._processPort(port)
+        for p in ports:
+            self.servers.append({'host':host, 'port':p})
+
+    def _processPort(self, port):
+        ''' In the case if port is 638[1,2]
+        '''
+        idx = port.find('[')
+        if idx == -1:
+            return [port]
+        idxend = port.find(']')
+        if idxend == -1:
+            raise Exception("Error in port")
+        starts = port[:idx]
+        ports = port[idx+1:idxend]
+        return [starts + p for p in ports.split(',')]
+
 
     def addNotify(self, event, estimatefunc):
         ''' this method provides notification if estimatefunc is true
