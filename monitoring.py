@@ -38,7 +38,6 @@ class Monitoring:
         client = self._createClient(server['host'], server['port'])
         connect = client.get_connection('monitor', None)
         connect.send_command('monitor')
-        print("monitoring of server {0}:{1} has started...".format(server['host'], server['port']), datetime.datetime.now())
         th = threading.Thread(target=self._start_receiving, args=(connect, ))
         th.setDaemon(True)
         th.start()
@@ -46,7 +45,9 @@ class Monitoring:
     def start(self, addr='localhost'):
         """ Start monitoring """
         self.processing = Processing(self.host, self.port, notify=self.notifications)
+        print("Monitoring of servers: ")
         for server in self.servers:
+            print("{0}:{1} has started...".format(server['host'], server['port']), datetime.datetime.now())
             self._createMonitor(server)
         while True:
             time.sleep(2)
