@@ -50,7 +50,7 @@ class Monitoring:
         while True:
             time.sleep(2)
 
-    def start(self, addr='localhost'):
+    def start(self):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._start())
         loop.close()
