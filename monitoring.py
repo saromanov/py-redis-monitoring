@@ -1,9 +1,9 @@
 import redis
 import datetime
-import threading
 import time
 from collections import Counter
 import hashlib
+import asyncio
 
 class Monitoring:
     """
@@ -30,27 +30,30 @@ class Monitoring:
         '''
         self.notifications[event] = estimatefunc
 
-    def _start_receiving(self, connect):
+    async def _start_receiving(self, connect):
         while True:
             self.processing.receive_response(connect.read_response())
 
-    def _createMonitor(self, server):
+    async def _createMonitor(self, server):
         client = self._createClient(server['host'], server['port'])
         connect = client.get_connection('monitor', None)
         connect.send_command('monitor')
-        th = threading.Thread(target=self._start_receiving, args=(connect, ))
-        th.setDaemon(True)
-        th.start()
+        await self._start_receiving(connect)
 
-    def start(self, addr='localhost'):
+    async def _start(self, addr='localhost'):
         """ Start monitoring """
         self.processing = Processing(self.host, self.port, notify=self.notifications)
         print("Monitoring of servers: ")
         for server in self.servers:
             print("{0}:{1} has started...".format(server['host'], server['port']), datetime.datetime.now())
-            self._createMonitor(server)
+            await self._createMonitor(server)
         while True:
             time.sleep(2)
+
+    def start(self, addr='localhost'):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self._start())
+        loop.close()
 
 class Processing:
     """ Processing and analytics receive commands """
