@@ -13,10 +13,13 @@ class ProcessingClient:
         md5.update(host)
         return 'monitor_{0}'.format(md5.hexdigest())
 
+    def _getCommandsStat(self, command, host):
+        return int(self.client.hget(host, command))
+
     def getCommandStat(self, command, host='allhosts'):
         if host != 'allhosts':
             host = 'monitor_{0}'.format(host)
-        return int(self.client.hget(host, command))
+        return self._getCommandsStat(command, host)
 
     def getCommandStatByHour(self, hour, command, host='allhosts'):
         """ Return statistics for commands by hour.
@@ -32,7 +35,7 @@ class ProcessingClient:
             host = self._processHost(host)
         def sortResults(results):
             return sorted(results, key=lambda x: x[1], reverse=True)
-        result = list(map(lambda x: (x.decode('utf-8'), self.getCommandStat(x, host=host)), self.client.hkeys(host)))
+        result = list(map(lambda x: (x.decode('utf-8'), self._getCommandsStat(x, host)), self.client.hkeys(host)))
         return sortResults(result)
 
     def getCommandsParams(self, command, host='allhosts'):
