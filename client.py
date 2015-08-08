@@ -11,11 +11,11 @@ class ProcessingClient:
     def _processHost(self, host):
         md5 = hashlib.md5()
         md5.update(host)
-        return md5.hexdigest()
+        return 'monitor_{0}'.format(md5.hexdigest())
 
     def getCommandStat(self, command, host='allhosts'):
         if host != 'allhosts':
-            host = self._processHost(host)
+            host = 'monitor_{0}'.format(host)
         return int(self.client.hget(host, command))
 
     def getCommandStatByHour(self, hour, command, host='allhosts'):
