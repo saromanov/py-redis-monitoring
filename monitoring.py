@@ -114,6 +114,7 @@ class RedisWrite:
         self.client.hincrby(addr, command)
         self.client.hincrby('allhosts', command)
         self.client.hincrby('allhosts:{0}'.format(command), params)
+        self.client.hincrby('monitor_host: {0}'.format(addr), command)
         """Append data by hour """
         hour = datetime.datetime.now().hour
         self.client.hincrby('allhosts:h{0}'.format(hour), command)
