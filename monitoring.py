@@ -90,6 +90,10 @@ class Processing:
         self.redis_store.putEvent(md5.hexdigest(), command, params)
 
     def _parse_response(self, response):
+        '''
+          This method returns triplet of address of getting command, command
+          and additional params
+        '''
         raw = response.split()
         addr = raw[2][:-1]
         command = raw[3][1:-1]
