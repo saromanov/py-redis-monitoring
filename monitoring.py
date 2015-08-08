@@ -60,7 +60,7 @@ class Monitoring:
         self.processing = Processing(self.host, self.port, notify=self.notifications)
         print("Monitoring of servers: ")
         for server in self.servers:
-            print("{0}:{1} has started...".format(server['host'], server['port']), datetime.datetime.now())
+            print("{0}:{1} has been started...".format(server['host'], server['port']), datetime.datetime.now())
             await self._createMonitor(server)
         while True:
             time.sleep(2)
