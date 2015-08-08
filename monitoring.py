@@ -45,7 +45,7 @@ class Monitoring:
         '''
         self.notifications[event] = estimatefunc
 
-    async def _start_receiving(self, connect):
+    def _start_receiving(self, connect):
         while True:
             self.processing.receive_response(connect.read_response())
 
@@ -53,7 +53,7 @@ class Monitoring:
         client = self._createClient(server['host'], server['port'])
         connect = client.get_connection('monitor', None)
         connect.send_command('monitor')
-        await self._start_receiving(connect)
+        self._start_receiving(connect)
 
     async def _start(self, addr='localhost'):
         """ Start monitoring """
@@ -83,8 +83,6 @@ class Processing:
             return
         addr, command, params = self._parse_response(response)
         command = command.decode('utf-8')
-        if command in self.notify:
-            self.notify(command)
         command = command.lower()
         self.commands_stat[command] += 1
         md5 = hashlib.md5()
