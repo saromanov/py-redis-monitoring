@@ -6,6 +6,7 @@ services:
     - redis-server
 before_install:
     - redis-server --port 6380 &
+    - python3.5 ./tests/server.py &
 
 install: 
     -  pip install .
