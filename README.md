@@ -1,4 +1,4 @@
-# py-redis-monitoring
+# py-redis-monitoring [![Build Status](https://travis-ci.org/saromanov/py-redis-monitoring.svg?branch=master)](https://travis-ci.org/saromanov/py-redis-monitoring) [![Coverage Status](https://coveralls.io/repos/saromanov/py-redis-monitoring/badge.svg?branch=master&service=github)](https://coveralls.io/github/saromanov/py-redis-monitoring?branch=master)
 
 
 Monitoring of Redis commands
