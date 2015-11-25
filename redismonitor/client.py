@@ -73,3 +73,9 @@ class ProcessingClient:
             raise Exception("Commands stat is not found")
         totalnum = reduce(lambda x, y: x + y[1], commands, 0)
         return [(item[0], item[1] / totalnum) for item in commands]
+
+    def removeData(self, host='allhosts'):
+        if host != 'allhosts':
+            host = self._processHost(host)
+        for command in self.client.hkeys(host):
+            self.client.hdel(host, command)
