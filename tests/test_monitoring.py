@@ -1,9 +1,11 @@
 import redismonitor
 import pytest
 
+
 @pytest.mark.incremental
 class TestMonitoring:
     mon = redismonitor.Monitoring()
+
     def test_init(self):
         assert self.mon.host == 'localhost'
         assert self.mon.port == 6379
@@ -14,7 +16,6 @@ class TestMonitoring:
         self.mon.addServer('localhost', '6381')
         self.mon.addServer('localhost', '6382')
         assert len(self.mon.servers) == 4
-
 
     def test_add_notofy(self):
         self.mon.addNotify('hset', lambda x: x)

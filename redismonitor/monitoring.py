@@ -5,26 +5,29 @@ from collections import Counter
 import hashlib
 import asyncio
 
+
 class Monitoring:
+
     """
         clearall - clear all store before start monitoring
         monitoring_host, monitoring_port in case if backend is redis
     """
+
     def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, backend=None, address=None):
         self.servers = []
         self.host = host
         self.port = port
-        self.notifications={}
+        self.notifications = {}
         self.show_every = show_every
         self.processing = Processing(host, port)
 
-    def _createClient(self,host, port):
+    def _createClient(self, host, port):
         return redis.ConnectionPool(host=host, port=port)
 
     def addServer(self, host, port):
         ports = self._processPort(port)
         for p in ports:
-            self.servers.append({'host':host, 'port':p})
+            self.servers.append({'host': host, 'port': p})
 
     def _processPort(self, port):
         ''' In the case if port is 638[1,2]
@@ -36,9 +39,8 @@ class Monitoring:
         if idxend == -1:
             raise Exception("Error in port")
         starts = port[:idx]
-        ports = port[idx+1:idxend]
+        ports = port[idx + 1:idxend]
         return [starts + p for p in ports.split(',')]
-
 
     def addNotify(self, event, estimatefunc):
         ''' this method provides notification if estimatefunc is true
@@ -57,10 +59,12 @@ class Monitoring:
 
     async def _start(self, addr='localhost'):
         """ Start monitoring """
-        self.processing = Processing(self.host, self.port, notify=self.notifications)
+        self.processing = Processing(
+            self.host, self.port, notify=self.notifications)
         print("Monitoring of servers: ")
         for server in self.servers:
-            print("{0}:{1} has been started...".format(server['host'], server['port']), datetime.datetime.now())
+            print("{0}:{1} has been started...".format(
+                server['host'], server['port']), datetime.datetime.now())
             await self._createMonitor(server)
         while True:
             time.sleep(2)
@@ -70,8 +74,11 @@ class Monitoring:
         loop.run_until_complete(self._start())
         loop.close()
 
+
 class Processing:
+
     """ Processing and analytics receive commands """
+
     def __init__(self, host, port, notify={}):
         self.host = {}
         self.notify = notify
@@ -106,9 +113,12 @@ class Processing:
 
 
 class RedisWrite:
+
     """ Write data to addition redis db """
+
     def __init__(self, host, port):
-        self.client = redis.StrictRedis(connection_pool=redis.ConnectionPool(host=host, port=port))
+        self.client = redis.StrictRedis(
+            connection_pool=redis.ConnectionPool(host=host, port=port))
 
     def putEvent(self, addr, command, params):
         """ Increment new command """
@@ -119,12 +129,13 @@ class RedisWrite:
         """Append data by hour """
         hour = datetime.datetime.now().hour
         self.client.hincrby('allhosts:h{0}'.format(hour), command)
-        #Append curent received command to list
+        # Append curent received command to list
         self.client.lpush('allhosts:commands', command)
 
+
 class Event:
+
     def __init__(self, addr, command, params):
         self.addr = addr
         self.command = command
         self.params = params
-

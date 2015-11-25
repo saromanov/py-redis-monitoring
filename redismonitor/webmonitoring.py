@@ -6,10 +6,11 @@ monitor = Monitoring(backend=False)
 
 @app.route('/')
 def main_page():
-	return "Your monitor is started"
+    return "Your monitor is started"
+
 
 def run_webmonitor():
-	app.run()
+    app.run()
 
 if __name__ == "__main__":
-	run_webmonitor()
+    run_webmonitor()
