@@ -13,7 +13,8 @@ class Monitoring:
         monitoring_host, monitoring_port in case if backend is redis
     """
 
-    def __init__(self, host='localhost', port=6379, show_every=10, clearall=False, backend=None, address=None):
+    def __init__(self, host='localhost', port=6379, show_every=10,
+                 clearall=False, backend=None, address=None):
         self.servers = []
         self.host = host
         self.port = port

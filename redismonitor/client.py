@@ -10,7 +10,9 @@ class ProcessingClient:
     def __init__(self, backend='redis', host='localhost', port=6379):
         if backend == 'redis':
             self.client = redis.Redis(
-                connection_pool=redis.ConnectionPool(host=host, port=str(6379)))
+                connection_pool=redis.ConnectionPool(
+                    host=host, port=str(6379))
+                )
 
     def _processHost(self, host):
         md5 = hashlib.md5()
@@ -27,7 +29,8 @@ class ProcessingClient:
 
     def getCommandStatByHour(self, hour, command, host='allhosts'):
         """ Return statistics for commands by hour.
-            For example, hour=10 command='hset' return statistic for command in 10 a.m
+            For example, hour=10 command='hset' return statistic
+            for command in 10 a.m
         """
         if hour >= 0 and hour <= 23:
             return self.client.hget('{0}:h{1}'.format(host, hour), command)
@@ -41,7 +44,8 @@ class ProcessingClient:
         def sortResults(results):
             return sorted(results, key=lambda x: x[1], reverse=True)
         result = list(map(lambda x: (
-            x.decode('utf-8'), self._getCommandsStat(x, host)), self.client.hkeys(host)))
+            x.decode('utf-8'), self._getCommandsStat(x, host)),
+            self.client.hkeys(host)))
         return sortResults(result)
 
     def getCommandsParams(self, command, host='allhosts'):
